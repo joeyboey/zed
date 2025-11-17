@@ -77,11 +77,11 @@ struct ModelCapabilityToggles {
 }
 
 struct ModelInput {
-    name: Entity<SingleLineInput>,
-    max_completion_tokens: Entity<SingleLineInput>,
-    max_output_tokens: Entity<SingleLineInput>,
-    max_tokens: Entity<SingleLineInput>,
-    reasoning_effort: Entity<SingleLineInput>,
+    name: Entity<InputField>,
+    max_completion_tokens: Entity<InputField>,
+    max_output_tokens: Entity<InputField>,
+    max_tokens: Entity<InputField>,
+    reasoning_effort: Entity<InputField>,
     capabilities: ModelCapabilityToggles,
 }
 

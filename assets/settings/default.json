@@ -1903,9 +1903,19 @@
     "anthropic": {
       "api_url": "https://api.anthropic.com"
     },
+    "anthropic_vertex": {
+      "api_url": "https://europe-west1-aiplatform.googleapis.com",
+      "project_id": "",
+      "location_id": "europe-west1"
+    },
     "bedrock": {},
     "google": {
       "api_url": "https://generativelanguage.googleapis.com"
+    },
+    "google_vertex": {
+      "api_url": "https://europe-west1-aiplatform.googleapis.com",
+      "project_id": "",
+      "location_id": "europe-west1"
     },
     "ollama": {
       "api_url": "http://localhost:11434"
