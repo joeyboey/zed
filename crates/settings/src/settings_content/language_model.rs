@@ -3,6 +3,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 use settings_macros::MergeFrom;
+use std::str::FromStr;
 
 use std::sync::Arc;
 
@@ -218,6 +219,19 @@ pub enum OpenAiReasoningEffort {
     High,
 }
 
+impl FromStr for OpenAiReasoningEffort {
+    type Err = ();
+    fn from_str(input: &str) -> Result<OpenAiReasoningEffort, Self::Err> {
+        match input {
+            "minimal" => Ok(OpenAiReasoningEffort::Minimal),
+            "low" => Ok(OpenAiReasoningEffort::Low),
+            "medium" => Ok(OpenAiReasoningEffort::Medium),
+            "high" => Ok(OpenAiReasoningEffort::High),
+            _ => Err(()),
+        }
+    }
+}
+
 #[skip_serializing_none]
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, JsonSchema, MergeFrom)]
 pub struct OpenAiCompatibleSettingsContent {
@@ -233,6 +247,7 @@ pub struct OpenAiCompatibleAvailableModel {
     pub max_tokens: u64,
     pub max_output_tokens: Option<u64>,
     pub max_completion_tokens: Option<u64>,
+    pub reasoning_effort: Option<OpenAiReasoningEffort>,
     #[serde(default)]
     pub capabilities: OpenAiCompatibleModelCapabilities,
 }
