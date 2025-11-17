@@ -6,6 +6,7 @@ use fs::Fs;
 use gpui::{DismissEvent, Entity, EventEmitter, FocusHandle, Focusable, Render, Task};
 use language_model::LanguageModelRegistry;
 use language_models::provider::open_ai_compatible::{AvailableModel, ModelCapabilities};
+pub use settings::OpenAiReasoningEffort as ReasoningEffort;
 use settings::{OpenAiCompatibleSettingsContent, update_settings_file};
 use ui::{
     Banner, Checkbox, KeyBinding, Modal, ModalFooter, ModalHeader, Section, ToggleState, prelude::*,
@@ -80,6 +81,7 @@ struct ModelInput {
     max_completion_tokens: Entity<SingleLineInput>,
     max_output_tokens: Entity<SingleLineInput>,
     max_tokens: Entity<SingleLineInput>,
+    reasoning_effort: Entity<SingleLineInput>,
     capabilities: ModelCapabilityToggles,
 }
 
@@ -107,6 +109,13 @@ impl ModelInput {
             cx,
         );
         let max_tokens = single_line_input("Max Tokens", "Max Tokens", Some("200000"), window, cx);
+        let reasoning_effort = single_line_input(
+            "Reasoning Effort",
+            "e.g. Minimal, Low, Medium, High",
+            None,
+            window,
+            cx,
+        );
         let ModelCapabilities {
             tools,
             images,
@@ -118,6 +127,7 @@ impl ModelInput {
             max_completion_tokens,
             max_output_tokens,
             max_tokens,
+            reasoning_effort,
             capabilities: ModelCapabilityToggles {
                 supports_tools: tools.into(),
                 supports_images: images.into(),
@@ -155,6 +165,17 @@ impl ModelInput {
                 .text(cx)
                 .parse::<u64>()
                 .map_err(|_| SharedString::from("Max Tokens must be a number"))?,
+            reasoning_effort: Some(
+                self.reasoning_effort
+                    .read(cx)
+                    .text(cx)
+                    .parse::<ReasoningEffort>()
+                    .map_err(|_| {
+                        SharedString::from(
+                            "Reasoning Effort must be off: minimal, low, medium, high",
+                        )
+                    })?,
+            ),
             capabilities: ModelCapabilities {
                 tools: self.capabilities.supports_tools.selected(),
                 images: self.capabilities.supports_images.selected(),
