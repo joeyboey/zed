@@ -634,6 +634,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "anthropic_vertex_ai"
+version = "0.1.0"
+dependencies = [
+ "anthropic",
+ "anyhow",
+ "chrono",
+ "futures 0.3.31",
+ "http_client",
+ "schemars 1.0.4",
+ "serde",
+ "serde_json",
+ "settings",
+ "strum 0.27.2",
+ "thiserror 2.0.17",
+]
+
+[[package]]
 name = "any_vec"
 version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7240,6 +7257,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "google_vertex_ai"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "futures 0.3.31",
+ "http_client",
+ "schemars 1.0.4",
+ "serde",
+ "serde_json",
+ "settings",
+ "strum 0.27.2",
+]
+
+[[package]]
 name = "gpu-alloc"
 version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -8896,6 +8927,7 @@ version = "0.1.0"
 dependencies = [
  "ai_onboarding",
  "anthropic",
+ "anthropic_vertex_ai",
  "anyhow",
  "aws-config",
  "aws-credential-types",
@@ -8914,6 +8946,7 @@ dependencies = [
  "fs",
  "futures 0.3.31",
  "google_ai",
+ "google_vertex_ai",
  "gpui",
  "gpui_tokio",
  "http_client",
