@@ -1,13 +1,11 @@
 use collections::HashMap;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use serde_with::skip_serializing_none;
-use settings_macros::MergeFrom;
-use std::str::FromStr;
+use settings_macros::{MergeFrom, with_fallible_options};
 
 use std::sync::Arc;
 
-#[skip_serializing_none]
+#[with_fallible_options]
 #[derive(Default, Clone, Debug, Serialize, Deserialize, PartialEq, JsonSchema, MergeFrom)]
 pub struct AllLanguageModelSettingsContent {
     pub anthropic: Option<AnthropicSettingsContent>,
@@ -28,14 +26,14 @@ pub struct AllLanguageModelSettingsContent {
     pub zed_dot_dev: Option<ZedDotDevSettingsContent>,
 }
 
-#[skip_serializing_none]
+#[with_fallible_options]
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, JsonSchema, MergeFrom)]
 pub struct AnthropicSettingsContent {
     pub api_url: Option<String>,
     pub available_models: Option<Vec<AnthropicAvailableModel>>,
 }
 
-#[skip_serializing_none]
+#[with_fallible_options]
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, JsonSchema, MergeFrom)]
 pub struct AnthropicAvailableModel {
     /// The model's name in the Anthropic API. e.g. claude-3-5-sonnet-latest, claude-3-opus-20240229, etc
@@ -57,7 +55,7 @@ pub struct AnthropicAvailableModel {
     pub mode: Option<ModelMode>,
 }
 
-#[skip_serializing_none]
+#[with_fallible_options]
 #[derive(Default, Clone, Debug, Serialize, Deserialize, PartialEq, JsonSchema, MergeFrom)]
 pub struct AmazonBedrockSettingsContent {
     pub available_models: Option<Vec<BedrockAvailableModel>>,
@@ -65,9 +63,10 @@ pub struct AmazonBedrockSettingsContent {
     pub region: Option<String>,
     pub profile: Option<String>,
     pub authentication_method: Option<BedrockAuthMethodContent>,
+    pub allow_global: Option<bool>,
 }
 
-#[skip_serializing_none]
+#[with_fallible_options]
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, JsonSchema, MergeFrom)]
 pub struct BedrockAvailableModel {
     pub name: String,
@@ -86,19 +85,22 @@ pub enum BedrockAuthMethodContent {
     NamedProfile,
     #[serde(rename = "sso")]
     SingleSignOn,
+    #[serde(rename = "api_key")]
+    ApiKey,
     /// IMDSv2, PodIdentity, env vars, etc.
     #[serde(rename = "default")]
     Automatic,
 }
 
-#[skip_serializing_none]
+#[with_fallible_options]
 #[derive(Default, Clone, Debug, Serialize, Deserialize, PartialEq, JsonSchema, MergeFrom)]
 pub struct OllamaSettingsContent {
     pub api_url: Option<String>,
+    pub auto_discover: Option<bool>,
     pub available_models: Option<Vec<OllamaAvailableModel>>,
 }
 
-#[skip_serializing_none]
+#[with_fallible_options]
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, JsonSchema, MergeFrom)]
 pub struct OllamaAvailableModel {
     /// The model name in the Ollama API (e.g. "llama3.2:latest")
@@ -139,14 +141,14 @@ impl Default for KeepAlive {
     }
 }
 
-#[skip_serializing_none]
+#[with_fallible_options]
 #[derive(Default, Clone, Debug, Serialize, Deserialize, PartialEq, JsonSchema, MergeFrom)]
 pub struct LmStudioSettingsContent {
     pub api_url: Option<String>,
     pub available_models: Option<Vec<LmStudioAvailableModel>>,
 }
 
-#[skip_serializing_none]
+#[with_fallible_options]
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, JsonSchema, MergeFrom)]
 pub struct LmStudioAvailableModel {
     pub name: String,
@@ -156,14 +158,14 @@ pub struct LmStudioAvailableModel {
     pub supports_images: bool,
 }
 
-#[skip_serializing_none]
+#[with_fallible_options]
 #[derive(Default, Clone, Debug, Serialize, Deserialize, PartialEq, JsonSchema, MergeFrom)]
 pub struct DeepseekSettingsContent {
     pub api_url: Option<String>,
     pub available_models: Option<Vec<DeepseekAvailableModel>>,
 }
 
-#[skip_serializing_none]
+#[with_fallible_options]
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, JsonSchema, MergeFrom)]
 pub struct DeepseekAvailableModel {
     pub name: String,
@@ -172,14 +174,14 @@ pub struct DeepseekAvailableModel {
     pub max_output_tokens: Option<u64>,
 }
 
-#[skip_serializing_none]
+#[with_fallible_options]
 #[derive(Default, Clone, Debug, Serialize, Deserialize, PartialEq, JsonSchema, MergeFrom)]
 pub struct MistralSettingsContent {
     pub api_url: Option<String>,
     pub available_models: Option<Vec<MistralAvailableModel>>,
 }
 
-#[skip_serializing_none]
+#[with_fallible_options]
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, JsonSchema, MergeFrom)]
 pub struct MistralAvailableModel {
     pub name: String,
@@ -192,14 +194,14 @@ pub struct MistralAvailableModel {
     pub supports_thinking: Option<bool>,
 }
 
-#[skip_serializing_none]
+#[with_fallible_options]
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, JsonSchema, MergeFrom)]
 pub struct OpenAiSettingsContent {
     pub api_url: Option<String>,
     pub available_models: Option<Vec<OpenAiAvailableModel>>,
 }
 
-#[skip_serializing_none]
+#[with_fallible_options]
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, JsonSchema, MergeFrom)]
 pub struct OpenAiAvailableModel {
     pub name: String,
@@ -219,27 +221,14 @@ pub enum OpenAiReasoningEffort {
     High,
 }
 
-impl FromStr for OpenAiReasoningEffort {
-    type Err = ();
-    fn from_str(input: &str) -> Result<OpenAiReasoningEffort, Self::Err> {
-        match input {
-            "minimal" => Ok(OpenAiReasoningEffort::Minimal),
-            "low" => Ok(OpenAiReasoningEffort::Low),
-            "medium" => Ok(OpenAiReasoningEffort::Medium),
-            "high" => Ok(OpenAiReasoningEffort::High),
-            _ => Err(()),
-        }
-    }
-}
-
-#[skip_serializing_none]
+#[with_fallible_options]
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, JsonSchema, MergeFrom)]
 pub struct OpenAiCompatibleSettingsContent {
     pub api_url: String,
     pub available_models: Vec<OpenAiCompatibleAvailableModel>,
 }
 
-#[skip_serializing_none]
+#[with_fallible_options]
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, JsonSchema, MergeFrom)]
 pub struct OpenAiCompatibleAvailableModel {
     pub name: String,
@@ -252,7 +241,7 @@ pub struct OpenAiCompatibleAvailableModel {
     pub capabilities: OpenAiCompatibleModelCapabilities,
 }
 
-#[skip_serializing_none]
+#[with_fallible_options]
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, JsonSchema, MergeFrom)]
 pub struct OpenAiCompatibleModelCapabilities {
     pub tools: bool,
@@ -272,14 +261,14 @@ impl Default for OpenAiCompatibleModelCapabilities {
     }
 }
 
-#[skip_serializing_none]
+#[with_fallible_options]
 #[derive(Default, Clone, Debug, Serialize, Deserialize, PartialEq, JsonSchema, MergeFrom)]
 pub struct VercelSettingsContent {
     pub api_url: Option<String>,
     pub available_models: Option<Vec<VercelAvailableModel>>,
 }
 
-#[skip_serializing_none]
+#[with_fallible_options]
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, JsonSchema, MergeFrom)]
 pub struct VercelAvailableModel {
     pub name: String,
@@ -289,14 +278,14 @@ pub struct VercelAvailableModel {
     pub max_completion_tokens: Option<u64>,
 }
 
-#[skip_serializing_none]
+#[with_fallible_options]
 #[derive(Default, Clone, Debug, Serialize, Deserialize, PartialEq, JsonSchema, MergeFrom)]
 pub struct GoogleSettingsContent {
     pub api_url: Option<String>,
     pub available_models: Option<Vec<GoogleAvailableModel>>,
 }
 
-#[skip_serializing_none]
+#[with_fallible_options]
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, JsonSchema, MergeFrom)]
 pub struct GoogleAvailableModel {
     pub name: String,
@@ -305,7 +294,7 @@ pub struct GoogleAvailableModel {
     pub mode: Option<ModelMode>,
 }
 
-#[skip_serializing_none]
+#[with_fallible_options]
 #[derive(Default, Clone, Debug, Serialize, Deserialize, PartialEq, JsonSchema, MergeFrom)]
 pub struct GoogleVertexSettingsContent {
     pub api_url: Option<String>,
@@ -358,7 +347,7 @@ pub struct XAiSettingsContent {
     pub available_models: Option<Vec<XaiAvailableModel>>,
 }
 
-#[skip_serializing_none]
+#[with_fallible_options]
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, JsonSchema, MergeFrom)]
 pub struct XaiAvailableModel {
     pub name: String,
@@ -371,13 +360,13 @@ pub struct XaiAvailableModel {
     pub parallel_tool_calls: Option<bool>,
 }
 
-#[skip_serializing_none]
+#[with_fallible_options]
 #[derive(Default, Clone, Debug, Serialize, Deserialize, PartialEq, JsonSchema, MergeFrom)]
 pub struct ZedDotDevSettingsContent {
     pub available_models: Option<Vec<ZedDotDevAvailableModel>>,
 }
 
-#[skip_serializing_none]
+#[with_fallible_options]
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, JsonSchema, MergeFrom)]
 pub struct ZedDotDevAvailableModel {
     /// The provider of the language model.
@@ -414,14 +403,14 @@ pub enum ZedDotDevAvailableProvider {
     Google,
 }
 
-#[skip_serializing_none]
+#[with_fallible_options]
 #[derive(Default, Clone, Debug, Serialize, Deserialize, PartialEq, JsonSchema, MergeFrom)]
 pub struct OpenRouterSettingsContent {
     pub api_url: Option<String>,
     pub available_models: Option<Vec<OpenRouterAvailableModel>>,
 }
 
-#[skip_serializing_none]
+#[with_fallible_options]
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, JsonSchema, MergeFrom)]
 pub struct OpenRouterAvailableModel {
     pub name: String,
@@ -435,7 +424,7 @@ pub struct OpenRouterAvailableModel {
     pub provider: Option<OpenRouterProvider>,
 }
 
-#[skip_serializing_none]
+#[with_fallible_options]
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, JsonSchema, MergeFrom)]
 pub struct OpenRouterProvider {
     order: Option<Vec<String>>,
@@ -464,7 +453,7 @@ fn default_true() -> bool {
 }
 
 /// Configuration for caching language model messages.
-#[skip_serializing_none]
+#[with_fallible_options]
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, JsonSchema, MergeFrom)]
 pub struct LanguageModelCacheConfiguration {
     pub max_cache_anchors: usize,

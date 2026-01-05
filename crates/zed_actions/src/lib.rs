@@ -70,6 +70,8 @@ actions!(
         OpenTelemetryLog,
         /// Opens the performance profiler.
         OpenPerformanceProfiler,
+        /// Opens the onboarding view.
+        OpenOnboarding,
     ]
 );
 
@@ -215,6 +217,10 @@ pub mod git {
             Switch,
             /// Selects a different repository.
             SelectRepo,
+            /// Filter remotes.
+            FilterRemotes,
+            /// Create a git remote.
+            CreateRemote,
             /// Opens the git branch selector.
             #[action(deprecated_aliases = ["branches::OpenRecent"])]
             Branch,
@@ -250,6 +256,17 @@ pub mod command_palette {
     );
 }
 
+pub mod project_panel {
+    use gpui::actions;
+
+    actions!(
+        project_panel,
+        [
+            /// Toggles focus on the project panel.
+            ToggleFocus
+        ]
+    );
+}
 pub mod feedback {
     use gpui::actions;
 
@@ -335,6 +352,10 @@ pub mod agent {
             AddSelectionToThread,
             /// Resets the agent panel zoom levels (agent UI and buffer font sizes).
             ResetAgentZoom,
+            /// Toggles the utility/agent pane open/closed state.
+            ToggleAgentPane,
+            /// Pastes clipboard content without any formatting.
+            PasteRaw,
         ]
     );
 }
@@ -412,6 +433,12 @@ pub struct OpenRemote {
     #[serde(default)]
     pub create_new_window: bool,
 }
+
+/// Opens the dev container connection modal.
+#[derive(PartialEq, Clone, Deserialize, Default, JsonSchema, Action)]
+#[action(namespace = projects)]
+#[serde(deny_unknown_fields)]
+pub struct OpenDevContainer;
 
 /// Where to spawn the task in the UI.
 #[derive(Default, Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
@@ -531,6 +558,18 @@ actions!(
         OpenProjectDebugTasks,
     ]
 );
+
+pub mod vim {
+    use gpui::actions;
+
+    actions!(
+        vim,
+        [
+            /// Opens the default keymap file.
+            OpenDefaultKeymap
+        ]
+    );
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct WslConnectionOptions {
