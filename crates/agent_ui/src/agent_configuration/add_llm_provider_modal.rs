@@ -8,6 +8,7 @@ use gpui::{
 };
 use language_model::LanguageModelRegistry;
 use language_models::provider::open_ai_compatible::{AvailableModel, ModelCapabilities};
+pub use settings::OpenAiReasoningEffort as ReasoningEffort;
 use settings::{OpenAiCompatibleSettingsContent, update_settings_file};
 use ui::{
     Banner, Checkbox, KeyBinding, Modal, ModalFooter, ModalHeader, Section, ToggleState,
@@ -109,6 +110,7 @@ struct ModelInput {
     max_completion_tokens: Entity<InputField>,
     max_output_tokens: Entity<InputField>,
     max_tokens: Entity<InputField>,
+    reasoning_effort: Entity<InputField>,
     capabilities: ModelCapabilityToggles,
 }
 
@@ -161,6 +163,7 @@ impl ModelInput {
             max_completion_tokens,
             max_output_tokens,
             max_tokens,
+            reasoning_effort,
             capabilities: ModelCapabilityToggles {
                 supports_tools: tools.into(),
                 supports_images: images.into(),
@@ -198,6 +201,17 @@ impl ModelInput {
                 .text(cx)
                 .parse::<u64>()
                 .map_err(|_| SharedString::from("Max Tokens must be a number"))?,
+            reasoning_effort: Some(
+                self.reasoning_effort
+                    .read(cx)
+                    .text(cx)
+                    .parse::<ReasoningEffort>()
+                    .map_err(|_| {
+                        SharedString::from(
+                            "Reasoning Effort must be off: minimal, low, medium, high",
+                        )
+                    })?,
+            ),
             capabilities: ModelCapabilities {
                 tools: self.capabilities.supports_tools.selected(),
                 images: self.capabilities.supports_images.selected(),

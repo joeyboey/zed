@@ -4,8 +4,9 @@ use collections::HashMap;
 use settings::RegisterSetting;
 
 use crate::provider::{
-    anthropic::AnthropicSettings, bedrock::AmazonBedrockSettings, cloud::ZedDotDevSettings,
-    deepseek::DeepSeekSettings, google::GoogleSettings, lmstudio::LmStudioSettings,
+    anthropic::AnthropicSettings, anthropic_vertex::AnthropicVertexSettings,
+    bedrock::AmazonBedrockSettings, cloud::ZedDotDevSettings, deepseek::DeepSeekSettings,
+    google::GoogleSettings, google_vertex::GoogleVertexSettings, lmstudio::LmStudioSettings,
     mistral::MistralSettings, ollama::OllamaSettings, open_ai::OpenAiSettings,
     open_ai_compatible::OpenAiCompatibleSettings, open_router::OpenRouterSettings,
     vercel::VercelSettings, x_ai::XAiSettings,
@@ -14,9 +15,11 @@ use crate::provider::{
 #[derive(Debug, RegisterSetting)]
 pub struct AllLanguageModelSettings {
     pub anthropic: AnthropicSettings,
+    pub anthropic_vertex: AnthropicVertexSettings,
     pub bedrock: AmazonBedrockSettings,
     pub deepseek: DeepSeekSettings,
     pub google: GoogleSettings,
+    pub google_vertex: GoogleVertexSettings,
     pub lmstudio: LmStudioSettings,
     pub mistral: MistralSettings,
     pub ollama: OllamaSettings,
@@ -34,9 +37,11 @@ impl settings::Settings for AllLanguageModelSettings {
     fn from_settings(content: &settings::SettingsContent) -> Self {
         let language_models = content.language_models.clone().unwrap();
         let anthropic = language_models.anthropic.unwrap();
+        let anthropic_vertex = language_models.anthropic_vertex.unwrap();
         let bedrock = language_models.bedrock.unwrap();
         let deepseek = language_models.deepseek.unwrap();
         let google = language_models.google.unwrap();
+        let google_vertex = language_models.google_vertex.unwrap();
         let lmstudio = language_models.lmstudio.unwrap();
         let mistral = language_models.mistral.unwrap();
         let ollama = language_models.ollama.unwrap();
@@ -50,6 +55,12 @@ impl settings::Settings for AllLanguageModelSettings {
             anthropic: AnthropicSettings {
                 api_url: anthropic.api_url.unwrap(),
                 available_models: anthropic.available_models.unwrap_or_default(),
+            },
+            anthropic_vertex: AnthropicVertexSettings {
+                api_url: anthropic_vertex.api_url.unwrap(),
+                project_id: anthropic_vertex.project_id,
+                location_id: anthropic_vertex.location_id,
+                available_models: anthropic_vertex.available_models.unwrap_or_default(),
             },
             bedrock: AmazonBedrockSettings {
                 available_models: bedrock.available_models.unwrap_or_default(),
@@ -67,6 +78,12 @@ impl settings::Settings for AllLanguageModelSettings {
             google: GoogleSettings {
                 api_url: google.api_url.unwrap(),
                 available_models: google.available_models.unwrap_or_default(),
+            },
+            google_vertex: GoogleVertexSettings {
+                api_url: google_vertex.api_url.unwrap(),
+                project_id: google_vertex.project_id,
+                location_id: google_vertex.location_id,
+                available_models: google_vertex.available_models.unwrap_or_default(),
             },
             lmstudio: LmStudioSettings {
                 api_url: lmstudio.api_url.unwrap(),
